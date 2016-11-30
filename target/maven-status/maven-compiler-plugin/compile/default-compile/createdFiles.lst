@@ -1,0 +1,13 @@
+ycom\game\MouseControl.class
+ycom\game\ID.class
+ycom\main\Pathfinder.class
+ycom\game\Handler.class
+ycom\main\ReadMap.class
+ycom\visual\Window.class
+ycom\game\BattleGround.class
+ycom\game\Game.class
+ycom\game\Soldier.class
+ycom\game\Cover.class
+ycom\game\KeyControl.class
+ycom\game\GameObject.class
+ycom\main\Main.class
