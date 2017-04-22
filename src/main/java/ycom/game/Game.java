@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import ycom.ai.Ai;
 import ycom.visual.Window;
 
-public class Game extends Canvas implements Runnable{
+public class Game extends Canvas implements Runnable, Cloneable{
 	
 	public static final int WIDTH = 800, HEIGHT = WIDTH / 16 * 9;
 	public static final int MAPSIZE = 10;
@@ -31,6 +32,7 @@ public class Game extends Canvas implements Runnable{
 				)
 		
 	);
+	Ai blueTeam;
 	
 	public Game(){
 		new Window(WIDTH, HEIGHT, "YCOM", this);
@@ -52,7 +54,7 @@ public class Game extends Canvas implements Runnable{
 			{0,	0,	0,	-1,	0,	0,	0,	0,	0,	0}
 			
 		};
-		
+		int soldierCount = 0;
 		for(int i= 0; i< MAPSIZE; i++)
 			for (int j=0; j< MAPSIZE; j++) {
 				switch (startGround[j][i]) {
@@ -61,11 +63,15 @@ public class Game extends Canvas implements Runnable{
 					handler.addObjectFirst(battleGround[i][j]);
 					break;
 				case 1:
-					battleGround[i][j] = new Soldier(i, j, null, ID.Soldier, startGround[j][i], this, handler, names.get(rnd.nextInt(names.size())));
+					
+					battleGround[i][j] = new Soldier(i, j, null, ID.Soldier, startGround[j][i], this, handler, names.get(rnd.nextInt(names.size())), soldierCount);
+					soldierCount++;
 					handler.addObject(battleGround[i][j]);
 					break;
 				case 2:
-					battleGround[i][j] = new Soldier(i, j, null, ID.Soldier, startGround[j][i], this, handler, names.get(rnd.nextInt(names.size())));
+					
+					battleGround[i][j] = new Soldier(i, j, null, ID.Soldier, startGround[j][i], this, handler, names.get(rnd.nextInt(names.size())), soldierCount);
+					soldierCount++;
 					handler.addObject(battleGround[i][j]);
 					break;
 				case 0:
@@ -74,6 +80,8 @@ public class Game extends Canvas implements Runnable{
 				}
 			}
 		handler.addObjectFirst(new BattleGround(0, 0, null, ID.Battleground, this));
+		blueTeam = new Ai(handler, 1, this);
+		System.out.println(blueTeam);
 	}
 
 	public synchronized void start() {
@@ -123,6 +131,11 @@ public class Game extends Canvas implements Runnable{
 	
 	private void tick() {
 		handler.tick();
+
+		//blueTeam.tick();
+
+
+		
 	}
 	
 	private void render() {
@@ -141,5 +154,10 @@ public class Game extends Canvas implements Runnable{
 		g.dispose();
 		bs.show();
 	}
+	
+	 @Override
+	    public Object clone() throws CloneNotSupportedException {
+	        return super.clone();
+	    }
 
 }

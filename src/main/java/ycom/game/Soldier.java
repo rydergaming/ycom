@@ -7,19 +7,19 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import javafx.scene.text.Font;
+import ycom.ai.Operator;
 import ycom.main.Pathfinder;
 
-public class Soldier extends GameObject{
+public class Soldier extends GameObject implements Cloneable{
 
-	public int hp = 10;
+	public int hp = 5;
 	public int team;
+	public int number;
 	private boolean visible = false;
 	private boolean selected = false;
 	private boolean completedTurn = false;
-	public static final int VISIONDISTANCE = 5;
-	private int movesLeft = 2;
-	private LinkedList<Soldier> shootable = new LinkedList<Soldier>();
+	public static final int VISIONDISTANCE = 4;
+	private int movesLeft = 1;
 	private Soldier target;
 	private boolean isTargeted = false;
 	private Point moveTarget;
@@ -28,7 +28,7 @@ public class Soldier extends GameObject{
 	private String name;
 	private boolean hunkered;
 	
-	public Soldier(int mX, int mY, Image sprite, ID id, int team, Game game, Handler handler, String name) {
+	public Soldier(int mX, int mY, Image sprite, ID id, int team, Game game, Handler handler, String name, int number) {
 		super(mX, mY, sprite, id, game);
 		this.team = team;
 		this.handler = handler;
@@ -37,6 +37,7 @@ public class Soldier extends GameObject{
 		this.x = mX * 40 + 200;
 		this.y = mY * 40 + 12;
 		this.name = name;
+		this.number = number;
 		setMoveTarget(new Point(mX,mY));
 
 		// TODO Auto-generated constructor stub
@@ -47,51 +48,34 @@ public class Soldier extends GameObject{
 		if (movesLeft == 0 && !isCompletedTurn()) {
 			setSelected(false);
 			setCompletedTurn(true);
-			handler.moveCounter++;
+			//handler.moveCounter++;
 			handler.setHasSelected(false);
-
-			if (handler.moveCounter < 4) {
-				handler.team = 1;
-			}
-			if (handler.moveCounter >= 4)
-				handler.team = 2;
-			
-			
-			if (handler.moveCounter > 7) {
-				handler.moveCounter = 0;
-				handler.team = 1;
-				handler.endTurn();
-			}
-
-			System.out.println(handler.moveCounter + "\t" + handler.team);
+			//this.visible = false;
 			//System.out.println(handler.getActiveSoldier().team);
 		}
-		
-		if (getMoveTarget().x != mX || getMoveTarget().y != mY) {
-			if (path.size() != 0) {
-				game.battleGround[mX][mY] = null;
-				mX = path.get(0).x;
-				mY = path.get(0).y;				
-				this.x = mX * 40 + 200;
-				this.y = mY * 40 + 12;
-				game.battleGround[mX][mY] = this;
-				path.remove(0);
-			}
 
+		if (this.team == handler.team) {
+			setVisible(true);
+			
+			for (int i = 0 ; i< Game.MAPSIZE;i++)
+				for(int j = 0 ; j < Game.MAPSIZE; j++)
+					visibleEnemies(i, j);
 		}
 	}
 
 	@Override
-	public void render(Graphics g) {
-		if (this.team == handler.team)
-			setVisible(true);
+	public void render(Graphics g) {		
+
+		
 		if (!isVisible())
 			return;
+
 		if (isSelected()){
 			g.setColor(Color.yellow);
 			g.fillRect(x, y, 41, 41);
 			drawVision(g);
 			drawStats(g);
+			//System.out.println(handler.team + " " + handler.moveCounter);
 			
 		}
 		switch(team) {
@@ -111,32 +95,83 @@ public class Soldier extends GameObject{
 		}
 		
 	}
-	private boolean isInVision(int x, int y) {
-		if (Pathfinder.getDistance(mX, mY, x, y) < VISIONDISTANCE) {
-			return true;
-		}
-		return false;
-	}
+
 	private void drawVision(Graphics g) {
 
 		for (int i = 0 ; i< Game.MAPSIZE;i++)
 			for(int j = 0 ; j < Game.MAPSIZE; j++) {
-				if (game.battleGround[i][j] != null)
-					if (game.battleGround[i][j].getClass().getName() == "ycom.game.Soldier") {
-						Soldier tempSoldier = (Soldier)game.battleGround[i][j];
-
-						if (isInVision(tempSoldier.mX, tempSoldier.mY))
-							tempSoldier.setVisible(true);
-						else
-							tempSoldier.setVisible(false);
-					}
+				visibleEnemies(i, j);
 				int total = getDistance(i, j);
 				if (total < VISIONDISTANCE) {
 					g.setColor(Color.WHITE);
-					g.drawRect((i-mX)* 40 + x, (j-mY)*40 + y, 41, 41);
+					g.drawRect((i-getmX())* 40 + x, (j-getmY())*40 + y, 41, 41);
 				}
 				
 			}
+		
+		drawMoveablePlaces(g);
+	}
+	
+	private void drawMoveablePlaces(Graphics g) {
+		
+		if (team == 1) {
+			for (int i = 0; i < Game.MAPSIZE; i++)
+				for (int j= 0; j<Game.MAPSIZE; j++) {
+					int dist = getDistance(i, j);
+					if (dist < VISIONDISTANCE) {
+						g.setColor(Color.GREEN);
+						if (i > getmX())
+							g.drawRect((i-getmX())* 40 + x, (j-getmY())*40 + y, 41, 41);
+					}
+				}
+		}
+		else {
+			for (int i = 0; i < Game.MAPSIZE; i++)
+				for (int j= 0; j<Game.MAPSIZE; j++) {
+					int dist = getDistance(i, j);
+					if (dist < VISIONDISTANCE) {
+						g.setColor(Color.GREEN);
+						if (i < getmX())
+							g.drawRect((i-getmX())* 40 + x, (j-getmY())*40 + y, 41, 41);
+					}
+				}
+		}
+			
+		
+	}
+
+	public Soldier visibleEnemies(int i, int j) {
+		if (game.battleGround[i][j] != null)
+			if (game.battleGround[i][j].getId() == ID.Soldier) {
+				Soldier tempSoldier = (Soldier)game.battleGround[i][j];
+
+				if (tempSoldier.team == team)
+					tempSoldier.setVisible(true);
+				else {
+					
+				
+				if (isInVision(tempSoldier.getmX(), tempSoldier.getmY())) {
+					tempSoldier.setVisible(true);
+					//System.out.println(tempSoldier);
+					return tempSoldier;
+				}
+				
+				if (tempSoldier.isVisible())
+					return null;
+				
+
+				else
+					tempSoldier.setVisible(false);
+				}
+			}
+		return null;
+	}
+	
+	private boolean isInVision(int x, int y) {
+		if (Pathfinder.getDistanceWhole(getmX(), getmY(), x, y) < VISIONDISTANCE) {
+			return true;
+		}
+		return false;
 	}
 	
 	private void drawStats(Graphics g) {
@@ -146,6 +181,8 @@ public class Soldier extends GameObject{
 		g.drawString("HP: " + Integer.toString(hp), 10, 60);
 		g.drawString("Moves Left: " + Integer.toString(movesLeft), 10, 90);
 		g.drawString("Hunkered? " + hunkered, 10, 120);
+		g.drawString("Team: " + team, 10, 150);
+		g.drawString("Number: " + number, 10, 180);
 	}
 	
 	private void drawSelectedStats(Graphics g) {
@@ -154,6 +191,8 @@ public class Soldier extends GameObject{
 		g.drawString(name, 210 + 40 * Game.MAPSIZE, 30);
 		g.drawString("HP: " + Integer.toString(hp), 210 + 40 * Game.MAPSIZE, 60);
 		g.drawString("Hunkered? " + hunkered, 210 + 40 * Game.MAPSIZE, 90);
+		g.drawString("Team: " + team, 210 + 40 * Game.MAPSIZE, 120);
+		g.drawString("Number: " + number, 210 + 40 * Game.MAPSIZE, 180);
 	}
 
 	public String getName() {
@@ -164,6 +203,7 @@ public class Soldier extends GameObject{
 	}
 	public void decreaseMoves() {
 		movesLeft--;
+		handler.moveCounter++;
 	}
 	
 	public boolean isSelected() {
@@ -182,8 +222,9 @@ public class Soldier extends GameObject{
 	public void setCompletedTurn(boolean completedTurn) {
 		this.completedTurn = completedTurn;
 		if (!completedTurn) {
-			movesLeft = 2;
+			movesLeft = 1;
 		}
+		
 	}
 
 	public boolean isVisible() {
@@ -219,8 +260,8 @@ public class Soldier extends GameObject{
 	}
 	
 	public int getDistance(int i, int j) {
-		int dx = Math.abs(i - mX);
-		int dy = Math.abs(j - mY);
+		int dx = Math.abs(i - getmX());
+		int dy = Math.abs(j - getmY());
 		return dx + dy;
 	}
 
@@ -240,7 +281,32 @@ public class Soldier extends GameObject{
 		return hunkered;
 	}
 
+	/**
+	 * Sets the hunkered status of the soldier.
+	 * If the value is true, it ends the soldier's turn as well.
+	 */
 	public void setHunkered(boolean hunkered) {
 		this.hunkered = hunkered;
+		if (this.hunkered) {
+			while(movesLeft-->0){
+				handler.moveCounter++;
+			}
+			this.movesLeft = 0;
+
+		}
+
 	}
+	
+	@Override
+	protected Object clone() {
+		Soldier clone = new Soldier(mX, mY, sprite, id, team, game, handler, name, number);
+		return clone;
+		
+	}
+
+	public LinkedList<Soldier> getShootable() {
+		
+		return handler.getEnemiesInVision(this);
+	}
+	
 }

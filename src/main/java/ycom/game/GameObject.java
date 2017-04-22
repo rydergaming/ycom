@@ -6,14 +6,15 @@ import java.awt.Image;
 public abstract class GameObject {
 	
 	protected int x, y;
-	protected int mX, mY;
+	protected int mX;
+	protected int mY;
 	protected ID id;
 	protected Image sprite;
 	protected Game game;
 
 	public GameObject(int mX, int mY, Image sprite, ID id, Game game){
-		this.mX = mX;
-		this.mY = mY;
+		this.setmX(mX);
+		this.setmY(mY);
 		this.id = id;
 		this.sprite = sprite;
 		this.game = game;
@@ -40,5 +41,21 @@ public abstract class GameObject {
 	}
 	public ID getId() {
 		return id;
+	}
+
+	public int getmX() {
+		return mX;
+	}
+
+	public void setmX(int mX) {
+		this.mX = mX;
+	}
+
+	public int getmY() {
+		return mY;
+	}
+
+	public void setmY(int mY) {
+		this.mY = mY;
 	}
 }

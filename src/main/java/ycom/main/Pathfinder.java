@@ -23,7 +23,7 @@ public class Pathfinder {
 		
 		Point point = getNeighbor(new Point(sx, sy), tx, ty);
 		open.add(point);
-		System.out.println("We're searching for the path");
+		//System.out.println("We're searching for the path");
 		while (point.x != tx && point.y != ty) {
 
 			System.out.println(open);
@@ -60,7 +60,7 @@ public class Pathfinder {
 		
 		Point point = getNeighbor(new Point(sx, sy), tx, ty);
 		open.add(point);
-		System.out.println("We're searching for the path");
+		//System.out.println("We're searching for the path");
 		while (point.x != tx && point.y != ty) {
 
 			System.out.println(open);
@@ -118,6 +118,12 @@ public class Pathfinder {
 		int dx = sx - tx;
 	    int dy = sy - ty;
 	    return Math.sqrt((dx*dx)+(dy*dy));
+	}
+	
+	public static int getDistanceWhole(int sx, int sy, int tx, int ty) {
+		int dx = Math.abs(sx - tx);
+		int dy = Math.abs(sy - ty);
+		return dx + dy;
 	}
 	
 	private static int clamp(int i, int min, int max) {

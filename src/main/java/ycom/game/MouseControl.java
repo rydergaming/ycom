@@ -5,6 +5,8 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import ycom.ai.MoveOperator;
+import ycom.main.Actions;
 import ycom.main.Pathfinder;
 
 public class MouseControl implements MouseListener{
@@ -41,11 +43,11 @@ public class MouseControl implements MouseListener{
 				GameObject obj = game.battleGround[position.x][position.y];
 				if (obj.id == ID.Soldier) {
 					Soldier target = (Soldier)obj;
+					if (Pathfinder.getDistanceWhole(activeSoldier.getmX(), activeSoldier.getmY(), target.getmX(), target.getmY()) < activeSoldier.VISIONDISTANCE)
 					if (target.team != activeSoldier.team && target.isVisible()) {
 						Soldier tmpTarget = activeSoldier.getTarget();
 						if (tmpTarget != null)
 							tmpTarget.setTargeted(false);
-						activeSoldier.setTarget(null);
 						activeSoldier.setTarget(target);
 						target.setTargeted(true);
 						System.out.println("Targeted: " + activeSoldier.getTarget());
@@ -68,12 +70,20 @@ public class MouseControl implements MouseListener{
 			if (distance>= activeSoldier.VISIONDISTANCE)
 				return;
 			GameObject obj = game.battleGround[position.x][position.y];
-			if (obj == null) {
-				activeSoldier.setMoveTarget(position);
-				activeSoldier.setPath(Pathfinder
-						.findPath(game, activeSoldier.mX, activeSoldier.mY, activeSoldier.getMoveTarget().x, activeSoldier.getMoveTarget().y));
-				activeSoldier.appendPath(activeSoldier.getMoveTarget());
-				activeSoldier.decreaseMoves();
+			if (obj == null) 
+			switch (activeSoldier.team)	{
+			
+			case 1:
+				if (activeSoldier.getmX() < position.x)
+					MoveOperator.moveSoldier(game, activeSoldier, position);
+			break;
+			
+			case 2:
+				if (activeSoldier.getmX() > position.x)
+					MoveOperator.moveSoldier(game, activeSoldier, position);
+				
+			break;
+				
 				
 				
 			}
