@@ -13,9 +13,9 @@ public class AllOperators implements Operator{
 
 		LinkedList<Object> allOperator = new LinkedList<>();
 		LinkedList<Point> moveOperator = MoveOperator.getAllMoves(soldier);
-		LinkedList<Soldier> shootOperator = ShootOperator.getAllTargets(soldier);
-		allOperator.addAll(moveOperator);
-		allOperator.addAll(shootOperator);
+		//LinkedList<Soldier> shootOperator = ShootOperator.getAllTargets(soldier);
+		//allOperator.addAll(shootOperator);
+		allOperator.addAll(moveOperator);		
 		allOperator.add(true);
 		
 		

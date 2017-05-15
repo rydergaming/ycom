@@ -25,4 +25,10 @@ public class Cover extends GameObject{
 		
 	}
 
+	@Override
+	public Cover clone() {
+		Cover clone = new Cover(this.mX, this.mY, this.sprite, this.id, this.game);
+		
+		return clone;
+	}
 }

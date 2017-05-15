@@ -4,22 +4,23 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import ycom.game.Game;
+import ycom.game.Handler;
 
 public class Pathfinder {
 	
 	static ArrayList<Point> open = new ArrayList<Point>();
 	static ArrayList<Point> closed = new ArrayList<Point>();
 	static double minCost = 100;
-	static Game game;
+	static Handler handler;
 	
-	public static ArrayList<Point> findPath(Game game, int sx, int sy, int tx, int ty) {
+	public static ArrayList<Point> findPath(Handler handler, int sx, int sy, int tx, int ty) {
 		open.clear();
 		closed.clear();
 		if (getDistance(sx, sy, tx, ty) <= 1) {
 			open.add(new Point(tx,ty));
 			return open;
 		}
-		Pathfinder.game = game;
+		Pathfinder.handler = handler;
 		
 		Point point = getNeighbor(new Point(sx, sy), tx, ty);
 		open.add(point);
@@ -50,13 +51,13 @@ public class Pathfinder {
 		}
 		return neighbors;
 	}
-	public static ArrayList<Point> findPathOld(Game game, int sx, int sy, int tx, int ty) {
+	public static ArrayList<Point> findPathOld(Handler handler, int sx, int sy, int tx, int ty) {
 		open.clear();
 		closed.clear();
 		minCost = 100;
 		open.add(new Point(sx,sy));
 		closed.add(new Point(sx,sy));
-		Pathfinder.game = game;
+		Pathfinder.handler = handler;
 		
 		Point point = getNeighbor(new Point(sx, sy), tx, ty);
 		open.add(point);
@@ -87,13 +88,13 @@ public class Pathfinder {
 				if (j < 0 || j >= Game.MAPSIZE)
 					continue;
 				
-				if (game.battleGround[i][j] != null) {
+				if (handler.battleGround[i][j] != null) {
 					closed.add(new Point(i,j));
 					continue;
 				}
 				double distance = getDistance(i,j,tx,ty);
 				if (distance < minCost) {
-					if (game.battleGround[i][j] == null) {
+					if (handler.battleGround[i][j] == null) {
 						if (closed.contains(new Point(i,j)))
 							continue;
 						minCost = distance;

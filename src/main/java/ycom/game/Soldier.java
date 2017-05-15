@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import ycom.ai.Operator;
 import ycom.main.Pathfinder;
 
-public class Soldier extends GameObject implements Cloneable{
+public class Soldier extends GameObject implements Comparable<Soldier>{
 
 	public int hp = 5;
 	public int team;
@@ -28,7 +28,8 @@ public class Soldier extends GameObject implements Cloneable{
 	private String name;
 	private boolean hunkered;
 	
-	public Soldier(int mX, int mY, Image sprite, ID id, int team, Game game, Handler handler, String name, int number) {
+	public Soldier(int mX, int mY, Image sprite, ID id, int team, Game game, 
+			Handler handler, String name, int number) {
 		super(mX, mY, sprite, id, game);
 		this.team = team;
 		this.handler = handler;
@@ -38,17 +39,17 @@ public class Soldier extends GameObject implements Cloneable{
 		this.y = mY * 40 + 12;
 		this.name = name;
 		this.number = number;
-		setMoveTarget(new Point(mX,mY));
-
-		// TODO Auto-generated constructor stub
+		if (number == 0) {
+			this.setSelected(true);
+		}
 	}
 
 	@Override
 	public void tick() {
-		if (movesLeft == 0 && !isCompletedTurn()) {
-			setSelected(false);
+		if (movesLeft <= 0 && !isCompletedTurn()) {
 			setCompletedTurn(true);
-			//handler.moveCounter++;
+			setSelected(false);
+			handler.moveCounter++;
 			handler.setHasSelected(false);
 			//this.visible = false;
 			//System.out.println(handler.getActiveSoldier().team);
@@ -141,9 +142,9 @@ public class Soldier extends GameObject implements Cloneable{
 	}
 
 	public Soldier visibleEnemies(int i, int j) {
-		if (game.battleGround[i][j] != null)
-			if (game.battleGround[i][j].getId() == ID.Soldier) {
-				Soldier tempSoldier = (Soldier)game.battleGround[i][j];
+		if (handler.battleGround[i][j] != null)
+			if (handler.battleGround[i][j].getId() == ID.Soldier) {
+				Soldier tempSoldier = (Soldier)handler.battleGround[i][j];
 
 				if (tempSoldier.team == team)
 					tempSoldier.setVisible(true);
@@ -298,8 +299,20 @@ public class Soldier extends GameObject implements Cloneable{
 	}
 	
 	@Override
-	protected Object clone() {
-		Soldier clone = new Soldier(mX, mY, sprite, id, team, game, handler, name, number);
+	public Soldier clone() {
+		Soldier clone = new Soldier(this.mX, this.mY, this.sprite, this.id, this.team, this.game, this.handler, this.name, this.number);
+		clone.mX = this.mX;
+		clone.mY = this.mY;
+		clone.id = this.id;
+		clone.team = this.team;
+		clone.game = this.game;
+		clone.handler = this.handler;
+		clone.name = this.name;
+		clone.number = this.number;
+		clone.hp = this.hp;
+		clone.hunkered = this.hunkered;
+		clone.selected = this.selected;
+		
 		return clone;
 		
 	}
@@ -307,6 +320,12 @@ public class Soldier extends GameObject implements Cloneable{
 	public LinkedList<Soldier> getShootable() {
 		
 		return handler.getEnemiesInVision(this);
+	}
+
+	@Override
+	public int compareTo(Soldier o) {
+		// TODO Auto-generated method stub
+		return this.number - o.number;
 	}
 	
 }

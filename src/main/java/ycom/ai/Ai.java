@@ -1,6 +1,7 @@
 package ycom.ai;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,14 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ycom.game.BattleGroundOperations;
 import ycom.game.Cover;
 import ycom.game.Game;
 import ycom.game.GameObject;
 import ycom.game.Handler;
 import ycom.game.ID;
 import ycom.game.Soldier;
+import ycom.main.DeepCopy;
 
-public class Ai {
+public class Ai implements Serializable{
 
 	private Handler handler;
 	private int team;
@@ -24,7 +27,7 @@ public class Ai {
 	private GameObject[][] battleGround = new GameObject[Game.MAPSIZE][Game.MAPSIZE];
 	private LinkedList<Soldier> teamMembers = new LinkedList<Soldier>();
 	private Map<Integer, Soldier> enemyMembers = new HashMap<Integer, Soldier>();
-	private boolean thinking = false;
+	public boolean thinking = false;
 	private Game game;
 	private List<Point> possibleEnemies;
 	private int it;
@@ -213,23 +216,13 @@ public class Ai {
 	public void tick() {
 		if (isThinking())
 			return;
+		thinking = true;
+
+		//Handler myHandler = (Handler)DeepCopy.copy(handler);
+		MiniMax.minimaxStep(game, battleGround, handler, this, BattleGroundOperations.currentSoldier(battleGround) , 4);
+
 		
-		Soldier currentMember = null;
-		/*for (Soldier soldier: teamMembers) {
-			if (soldier.isSelected()) {
-				currentMember = soldier;
-				break;
-			}
-				
-		}*/
-		if (handler.getActiveSoldier().team == this.team) {
-			currentMember = handler.getActiveSoldier();
-		}
-		if (currentMember == null)
-			return;
-		setThinking(true);
-		MiniMax.minimaxStep(game, handler, this, currentMember, 4);
-		
+		thinking = false;
 		//calculateNextMove(currentMember);	
 
 		

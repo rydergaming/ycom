@@ -16,27 +16,27 @@ import ycom.game.Soldier;
  */
 public class Actions {
 
-	public static void moveSoldier(Game game, Soldier activeSoldier, Point position) {
+	public static void moveSoldier(Handler handler, Soldier activeSoldier, Point position) {
 		activeSoldier.setMoveTarget(position);
 		activeSoldier.setPath(Pathfinder
-				.findPath(game, activeSoldier.getmX(), activeSoldier.getmY(), activeSoldier.getMoveTarget().x, activeSoldier.getMoveTarget().y));
+				.findPath(handler, activeSoldier.getmX(), activeSoldier.getmY(), activeSoldier.getMoveTarget().x, activeSoldier.getMoveTarget().y));
 		activeSoldier.appendPath(activeSoldier.getMoveTarget());
 		activeSoldier.decreaseMoves();
 	}
 	
-	public static void shootSoldier(Game game, Soldier soldier, Soldier target) {
+	public static void shootSoldier(Handler handler, Soldier soldier, Soldier target) {
 		soldier.decreaseMoves();
 		int dmg = 3;
 		if (target.isHunkered())
 			dmg--;
-		if (calculateCover(game, soldier.getmX(), soldier.getmY(), target.getmX(), target.getmY()))
+		if (calculateCover(handler, soldier.getmX(), soldier.getmY(), target.getmX(), target.getmY()))
 			dmg--;
 		target.dmgHp(dmg);
 		target.setTargeted(false);
 		soldier.setTarget(null);	
 	}
 	
-	private static boolean calculateCover(Game game, int sX, int sY, int tX, int tY) {
+	private static boolean calculateCover(Handler handler, int sX, int sY, int tX, int tY) {
 		int i = 0;
 		while( i < 4) {
 			GameObject tmp;
@@ -44,7 +44,7 @@ public class Actions {
 				case 0:
 					if (tY == 0)
 						break;
-					tmp = game.battleGround[tX][tY-1];
+					tmp = handler.battleGround[tX][tY-1];
 					if (tmp != null && tmp.getId() == ID.Cover) {
 						if (sY < tY-1)
 							return true;
@@ -53,7 +53,7 @@ public class Actions {
 				case 1:
 					if (tX == Game.MAPSIZE-1)
 						break;
-					tmp = game.battleGround[tX+1][tY];
+					tmp = handler.battleGround[tX+1][tY];
 					if (tmp != null && tmp.getId() == ID.Cover) {
 						if (sX > tX+1)
 							return true;
@@ -62,7 +62,7 @@ public class Actions {
 				case 2:
 					if (tY == Game.MAPSIZE-1)
 						break;
-					tmp = game.battleGround[tX][tY+1];
+					tmp = handler.battleGround[tX][tY+1];
 					if (tmp != null && tmp.getId() == ID.Cover) {
 						if (sY > tY+1)
 							return true;
@@ -71,7 +71,7 @@ public class Actions {
 				case 3:
 					if (tX == 0)
 						break;
-					tmp = game.battleGround[tX-1][tY];
+					tmp = handler.battleGround[tX-1][tY];
 					if (tmp != null && tmp.getId() == ID.Cover) {
 						if (sX < tX-1)
 							return true;

@@ -39,7 +39,7 @@ public class KeyControl implements KeyListener{
 				Soldier target = soldier.getTarget();
 				//Extract this so AI can use it
 				if (Pathfinder.getDistance(soldier.getmX(), soldier.getmY(), target.getmX(), target.getmY()) <= soldier.VISIONDISTANCE) {
-					ShootOperator.shootSoldier(game, soldier, target);
+					ShootOperator.shootSoldier(handler.battleGround, soldier, target);
 				}
 
 			}			

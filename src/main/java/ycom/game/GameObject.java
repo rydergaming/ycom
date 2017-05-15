@@ -2,8 +2,9 @@ package ycom.game;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.Serializable;
 
-public abstract class GameObject {
+public abstract class GameObject implements Serializable{
 	
 	protected int x, y;
 	protected int mX;

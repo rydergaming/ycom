@@ -36,11 +36,11 @@ public class MouseControl implements MouseListener{
 				return;
 			
 			System.out.print("You clicked at: " + position.x + " " + position.y);
-			System.out.println(". Got: " + game.battleGround[position.x][position.y]);
+			System.out.println(". Got: " + handler.battleGround[position.x][position.y]);
 			System.out.println("Active soldier: " + activeSoldier);
 			
-			if (game.battleGround[position.x][position.y] != null) {
-				GameObject obj = game.battleGround[position.x][position.y];
+			if (handler.battleGround[position.x][position.y] != null) {
+				GameObject obj = handler.battleGround[position.x][position.y];
 				if (obj.id == ID.Soldier) {
 					Soldier target = (Soldier)obj;
 					if (Pathfinder.getDistanceWhole(activeSoldier.getmX(), activeSoldier.getmY(), target.getmX(), target.getmY()) < activeSoldier.VISIONDISTANCE)
@@ -69,18 +69,18 @@ public class MouseControl implements MouseListener{
 			int distance = activeSoldier.getDistance(position.x, position.y);
 			if (distance>= activeSoldier.VISIONDISTANCE)
 				return;
-			GameObject obj = game.battleGround[position.x][position.y];
+			GameObject obj = handler.battleGround[position.x][position.y];
 			if (obj == null) 
 			switch (activeSoldier.team)	{
 			
 			case 1:
 				if (activeSoldier.getmX() < position.x)
-					MoveOperator.moveSoldier(game, activeSoldier, position);
+					MoveOperator.moveSoldier(handler.battleGround, activeSoldier, position);
 			break;
 			
 			case 2:
 				if (activeSoldier.getmX() > position.x)
-					MoveOperator.moveSoldier(game, activeSoldier, position);
+					MoveOperator.moveSoldier(handler.battleGround, activeSoldier, position);
 				
 			break;
 				
